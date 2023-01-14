@@ -100,12 +100,12 @@ async def do_task(e: events.NewMessage.Event) -> None:
     if e.sender_id in ADMINS:
         async with client.conversation(e.sender_id, timeout=20000000) as conv:
             await conv.send_message(
-                "Forward the last post of that channel\n__make sure bot must be admin there.__"
+                "Forward the last post of source channel \n make sure bot must be admin there"
             )
             res = await conv.get_response()
             chat, lid = res.fwd_from.from_id.channel_id, res.fwd_from.channel_post
             await conv.send_message(
-                "Number of messages to check?\n __Send 'ALL' for all__"
+                "Number of messages to check? \n Send 'ALL' for All Post"
             )
             res = await conv.get_response()
             msgs = get_number(res.text)
@@ -113,7 +113,7 @@ async def do_task(e: events.NewMessage.Event) -> None:
             res = await conv.get_response()
             views = int(res.text)
             await conv.send_message(
-                f"Send Channel UserNames or Ids to Forward posts, if views less than {views}\n __make sure bot is admin everywhere.__"
+                f"Send Channel UserName or Id to Forward posts. \nIf views less than {views}\n make sure bot is admin"
             )
             res = await conv.get_response()
             dests = get_chats(res.text)
