@@ -1,6 +1,7 @@
 import asyncio
 
 from telethon import TelegramClient, events
+from telethon.sessions import StringSession
 from telethon.tl.types import Message
 
 from settings import *
@@ -8,12 +9,16 @@ from settings import *
 ############## Client Setup ###############
 
 client = TelegramClient(None, 6, "eb06d4abfb49dc3eeb1aeb98ae0f581e")
+user_bot = TelegramClient(StringSession(SESSION_STRING), 6, "eb06d4abfb49dc3eeb1aeb98ae0f581e")
 loop = asyncio.get_event_loop()
 
 
 async def start_bot(token: str) -> None:
     await client.start(bot_token=token)
+    await user_bot.start()
     client.me = await client.get_me()
+    user_bot.me = await user_bot.get_me()
+    print(user_bot.me.username, "is Online Now.")
     print(client.me.username, "is Online Now.")
 
 
@@ -52,16 +57,15 @@ def get_chats(text: str) -> list:
 
 async def main_task(
     e: events.NewMessage.Event,
-    source_chat: str,
+    source_chat: int,
     posts: int,
     views: int,
-    last: int,
     dests: list,
 ) -> None:
-    if not (source_chat and views and last and dests):
+    if not (source_chat and views and dests):
         return
     r, v, f = 0, 0, 0
-    for z in reversed(range(posts, last)):
+    async for z in user_bot.iter_messages(source_chat, reverse=True):
         try:
             msg = await client.get_messages(source_chat, ids=[z])
             if isinstance(msg, list):
@@ -100,10 +104,10 @@ async def do_task(e: events.NewMessage.Event) -> None:
     if e.sender_id in ADMINS:
         async with client.conversation(e.sender_id, timeout=20000000) as conv:
             await conv.send_message(
-                "Forward the last post of source channel \n\nmake sure bot must be admin there"
+                "Forward A Post Of The Channel You Want to Check"
             )
             res = await conv.get_response()
-            chat, lid = res.fwd_from.from_id.channel_id, res.fwd_from.channel_post
+            chat = res.fwd_from.from_id.channel_id
             await conv.send_message(
                 "Number of messages to check? \n\nSend 'ALL' for All Post"
             )
@@ -118,7 +122,7 @@ async def do_task(e: events.NewMessage.Event) -> None:
             res = await conv.get_response()
             dests = get_chats(res.text)
             await conv.send_message("Process Started, i'll notify when its Complete")
-        await main_task(e, chat, msgs, views, lid, dests)
+        await main_task(e, chat, msgs, views, dests)
 
 
 client.run_until_disconnected()
