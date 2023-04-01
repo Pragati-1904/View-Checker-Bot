@@ -65,7 +65,7 @@ async def main_task(
     if not (source_chat and views and dests):
         return
     r, v, f = 0, 0, 0
-    async for z in user_bot.iter_messages(source_chat, reverse=True):
+    async for z in user_bot.iter_messages(source_chat, reverse=False):
         try:
             msg = await client.get_messages(source_chat, ids=[z])
             if isinstance(msg, list):
@@ -79,7 +79,7 @@ async def main_task(
             for dest in dests:
                 try:
                     await msg.forward_to(dest)
-                    await asyncio.sleep(15)
+                    await asyncio.sleep(45)
                     f += 1
                 except BaseException:
                     pass
