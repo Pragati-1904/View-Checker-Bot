@@ -79,7 +79,7 @@ async def main_task(
             for dest in dests:
                 try:
                     await msg.forward_to(dest)
-                    await asyncio.sleep(5)
+                    await asyncio.sleep(10)
                     f += 1
                 except BaseException:
                     pass
