@@ -92,7 +92,7 @@ async def main_task(
 
 @client.on(events.NewMessage(incoming=True, pattern="\\/start"))
 async def on_start(e: events.NewMessage.Event) -> None:
-    await e.reply("Hello.")
+    await e.reply("Welcome to View Tracker Bot\nWe Help you stay on top of all the views you missed on your last post ")
 
 
 @client.on(events.NewMessage(incoming=True, pattern="\\/check"))
